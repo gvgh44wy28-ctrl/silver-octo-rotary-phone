@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SpanWright v2.0 - Deck Design & Estimating</title>
+<meta name="theme-color" content="#0D1B2A">
+<style>
+:root{
+  --navy:#0D1B2A;--navy2:#071421;--gold:#D5A642;--gold2:#F2C766;--blue:#1F5F99;
+  --green:#12805C;--white:#fff;--muted:#98A2B3;--line:rgba(255,255,255,.12);
+  --card:rgba(255,255,255,.06);--ink:#101828;--paper:#F7F9FC;--danger:#B42318;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(145deg,var(--navy2),var(--navy) 48%,#111827);color:#fff;min-height:100vh}
+button,input,select,textarea{font:inherit}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,#091827,#071421);border-right:1px solid var(--line);padding:18px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.logo svg{width:52px;height:52px;flex:0 0 auto}
+.wordmark{line-height:1}
+.wordmark b{font-size:23px;letter-spacing:-.8px}
+.wordmark span{display:block;font-size:9px;letter-spacing:2.8px;color:#fff;margin-top:4px}
+.gold{color:var(--gold)}
+.navTitle{color:#8EA0B8;text-transform:uppercase;font-size:11px;font-weight:800;margin:18px 0 7px}
+.navBtn{width:100%;border:0;background:transparent;color:#DFE7F2;text-align:left;border-radius:13px;padding:11px 12px;margin:3px 0;font-weight:760;display:flex;gap:9px;align-items:center}
+.navBtn.active,.navBtn:hover{background:linear-gradient(135deg,rgba(213,166,66,.35),rgba(213,166,66,.12));color:#fff}
+.main{padding:18px;min-width:0}
+.topbar{height:64px;background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:22px;display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:14px}
+.projectSelect{background:#071421;color:#fff;border:1px solid var(--line);border-radius:14px;padding:11px;min-width:220px}
+.status{color:#69DB7C;font-weight:800;margin-right:auto}
+.iconBtn{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;border-radius:13px;padding:10px 12px;font-weight:800}
+.primary{background:linear-gradient(135deg,var(--gold),#9C6D16);border:0;color:#fff}
+.panel{display:none}.panel.active{display:block}
+.dashboardGrid{display:grid;grid-template-columns:1fr 330px;gap:14px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035));border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 22px 45px rgba(0,0,0,.18)}
+.card h2,.card h3{margin:0 0 12px}.card h3{font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:#fff}
+.studioTabs,.toolstrip{display:flex;gap:9px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px}
+.studioTabs button,.toolstrip button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#E6EDF3;border-radius:12px;padding:9px 11px;font-weight:800}
+.studioTabs button.active{color:var(--gold);border-color:rgba(213,166,66,.65)}
+.canvas{height:410px;border:1px solid var(--line);border-radius:18px;position:relative;overflow:hidden;background-color:#0A1824;background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:22px 22px;touch-action:none}
+.deck{position:absolute;left:230px;top:95px;width:340px;height:165px;background:repeating-linear-gradient(0deg,#A86A2F 0 12px,#8D5527 13px 15px);border:5px solid #5D371C;box-shadow:0 0 0 3px #C28A4B;cursor:grab}
+.stair{position:absolute;left:150px;top:245px;width:150px;height:95px;background:repeating-linear-gradient(45deg,#A86A2F 0 14px,#7A4723 15px 18px);border:5px solid #5D371C;transform:rotate(-38deg);box-shadow:0 0 0 3px #C28A4B;cursor:grab}
+.rail{position:absolute;background:#121820;border:3px solid #D7A65A}.rail.r1{left:230px;top:82px;width:340px;height:8px}.rail.r2{left:570px;top:95px;width:8px;height:165px}
+.dim{position:absolute;color:#fff;font-weight:900;text-shadow:0 2px 3px #000}.topDim{left:370px;top:60px}.leftDim{left:150px;top:185px}.rightDim{right:42px;top:166px}
+.tileGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:12px}
+.tile{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center;color:var(--gold)}
+.tile b{display:block;color:#fff;margin-top:6px}.tile small{color:#BAC6D6}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.metric{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:18px;padding:14px}
+.metric span{display:block;color:#A9B7C9;text-transform:uppercase;font-size:11px;font-weight:800}.metric b{display:block;font-size:24px;margin:8px 0}.metric small{color:#69DB7C}
+.takeoff p,.priceRow{display:flex;justify-content:space-between;gap:10px;color:#DDE7F3}
+.takeoff strong{display:block;color:var(--gold);font-size:28px;text-align:right;margin-top:12px}
+.formGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field{margin:8px 0}.field label{display:block;color:#D6E0EC;font-size:12px;text-transform:uppercase;font-weight:850;letter-spacing:.04em;margin-bottom:6px}
+input,select,textarea{width:100%;border:1px solid rgba(16,24,40,.16);border-radius:14px;padding:12px;background:#fff;color:#101828}
+textarea{min-height:90px;resize:vertical}
+.lightCard{background:#fff;color:#101828;border:1px solid rgba(16,24,40,.12);border-radius:22px;padding:18px}.lightCard h2,.lightCard h3{color:#101828}
+.accountWrap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.accountPreview{background:linear-gradient(160deg,#fff,#F3F7FC);color:#101828;border-radius:22px;padding:18px;border:1px solid rgba(16,24,40,.12)}
+.accountAvatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--gold));display:grid;place-items:center;color:#fff;font-size:30px;font-weight:900}
+.helpGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.helpItem{background:#fff;color:#101828;border-radius:18px;padding:16px;border:1px solid rgba(16,24,40,.12)}
+.helpItem h3{margin-top:0}
+.chartWrap{background:#fff;color:#101828;border-radius:22px;padding:18px;border:1px solid rgba(16,24,40,.12)}
+.chart{width:100%;height:360px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:#475467;font-weight:800}.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px}.wood{background:#A86A2F}.comp{background:#1F5F99}
+.savedList{display:grid;gap:10px}.savedItem{background:#fff;color:#101828;border-radius:16px;border:1px solid rgba(16,24,40,.12);padding:13px}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.dashboardGrid,.accountWrap,.helpGrid{grid-template-columns:1fr}.metrics,.tileGrid{grid-template-columns:1fr 1fr}.topbar{height:auto;flex-wrap:wrap}.status{margin-right:0}}
+@media print{.sidebar,.topbar,.noPrint{display:none!important}.app{display:block}.main{padding:0}.panel{display:none!important}#estimate{display:block!important}.card,.lightCard{box-shadow:none;border:0;background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar noPrint">
+    <div class="logo">
+      <svg viewBox="0 0 100 100" aria-label="SpanWright logo">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F2C766"/><stop offset=".55" stop-color="#D5A642"/><stop offset="1" stop-color="#9C6D16"/></linearGradient></defs>
+        <g fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="square" stroke-linejoin="round">
+          <path d="M50 4 L90 27 L90 73 L50 96 L10 73 L10 27 Z"/>
+          <path d="M69 28 L50 17 L31 28 L31 39 L64 58 L64 69 L50 77 L36 69 L36 61"/>
+          <path d="M31 39 L69 61 L69 72 L50 83 L12 61"/>
+        </g>
+      </svg>
+      <div class="wordmark"><b>SPAN<span class="gold">WRIGHT</span></b><span>DESIGN. ESTIMATE. BUILD.</span></div>
+    </div>
+    <div class="navTitle">Workspace</div>
+    <button class="navBtn active" onclick="showPanel('dashboard',this)">⌂ Dashboard</button>
+    <button class="navBtn" onclick="showPanel('designer',this)">▱ Designer</button>
+    <button class="navBtn" onclick="showPanel('estimate',this)">▢ Estimate</button>
+    <button class="navBtn" onclick="showPanel('pricing',this)">📈 Board Pricing</button>
+    <div class="navTitle">Business</div>
+    <button class="navBtn" onclick="showPanel('account',this)">👤 Account</button>
+    <button class="navBtn" onclick="showPanel('saved',this)">＋ Saved Files</button>
+    <button class="navBtn" onclick="showPanel('help',this)">? Help Center</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar noPrint">
+      <select class="projectSelect" id="projectName"><option>Sunset Deck Project</option><option>New Customer Deck</option></select>
+      <span class="status">☁ Saved locally</span>
+      <button class="iconBtn" onclick="saveProject()">Save Project</button>
+      <button class="iconBtn primary" onclick="downloadEstimate()">Download PDF</button>
+    </div>
+
+    <section id="dashboard" class="panel active">
+      <div class="dashboardGrid">
+        <div>
+          <div class="card">
+            <div class="studioTabs"><button class="active">Design</button><button>Layout</button><button>Framing</button><button>3D View</button><button>Estimate</button><button>Cut Lists</button></div>
+            <div class="toolstrip"><button>Select</button><button>Draw</button><button>Rectangle</button><button>Deck</button><button>Stairs</button><button>Post</button><button>Beam</button><button>Measure</button><button>Grid</button><button>Layers</button></div>
+            <div class="canvas" id="dashboardCanvas">
+              <div class="deck draggable"></div><div class="stair draggable"></div><div class="rail r1"></div><div class="rail r2"></div>
+              <div class="dim topDim">24'-0"</div><div class="dim leftDim">14'-0"</div><div class="dim rightDim">10'-0"</div>
+            </div>
+            <div class="tileGrid">
+              <div class="tile">⚙<b>AI Assistant</b><small>Smart material suggestions</small></div>
+              <div class="tile">▤<b>Cut Lists</b><small>Auto-generated lists</small></div>
+              <div class="tile">◎<b>Optimize</b><small>Reduce board waste</small></div>
+              <div class="tile">🏷<b>Live Pricing</b><small>Supplier updates</small></div>
+              <div class="tile">✎<b>Proposal & Sign</b><small>Estimate approval</small></div>
+            </div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><span>Active projects</span><b>18</b><small>+12% this month</small></div>
+            <div class="metric"><span>Proposals sent</span><b>$84,250</b><small>+18% this month</small></div>
+            <div class="metric"><span>Estimates won</span><b>$32,480</b><small>+15% this month</small></div>
+            <div class="metric"><span>Monthly revenue</span><b>$4,985</b><small>+22% this month</small></div>
+          </div>
+        </div>
+        <aside>
+          <div class="card takeoff"><h3>Material Takeoff</h3><p><span>Decking</span><b id="dashDecking">352 bd ft</b></p><p><span>Framing Lumber</span><b>1,246 bd ft</b></p><p><span>Railing</span><b>36 ft</b></p><p><span>Footings</span><b>6 ea</b></p><p><span>Hardware</span><b>$86.24</b></p><strong id="dashTotal">$2,842.18</strong></div>
+          <div class="card" style="margin-top:14px"><h3>AI Material Recommendations</h3><p>✓ Best value: pressure-treated lumber</p><p>✓ Upgrade: composite decking</p><p>✓ Low maintenance: aluminum railing</p><button class="iconBtn primary">Apply Recommendation</button></div>
+          <div class="card" style="margin-top:14px"><h3>Live Supplier Pricing</h3><div class="priceRow"><span>Lowe's</span><b>$2,842.18</b></div><div class="priceRow"><span>Home Depot</span><b>$2,936.45</b></div><div class="priceRow"><span>84 Lumber</span><b>$2,811.33</b></div></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="designer" class="panel">
+      <div class="card">
+        <h2>Interactive Designer</h2>
+        <p style="color:#DDE7F3">Drag the deck and stair blocks around the grid. This v2.0 preview is structured for a future CAD-like designer with snapping, layers, undo/redo, and model-linked takeoffs.</p>
+        <div class="toolstrip"><button onclick="addBlock('deck')">Add Deck Block</button><button onclick="addBlock('stair')">Add Stairs</button><button onclick="addBlock('rail')">Add Rail</button><button onclick="clearBlocks()">Clear Added Items</button></div>
+        <div class="canvas" id="designCanvas"><div class="deck draggable"></div><div class="stair draggable"></div><div class="rail r1"></div></div>
+      </div>
+    </section>
+
+    <section id="estimate" class="panel">
+      <div class="lightCard">
+        <h2>Estimate Builder</h2>
+        <div class="formGrid">
+          <div class="field"><label>Customer name</label><input id="customer" placeholder="Customer name"></div>
+          <div class="field"><label>Project address</label><input id="address" placeholder="Project address"></div>
+          <div class="field"><label>Deck length ft</label><input id="deckLen" type="number" value="16" oninput="calcEstimate()"></div>
+          <div class="field"><label>Deck width ft</label><input id="deckWid" type="number" value="12" oninput="calcEstimate()"></div>
+          <div class="field"><label>Decking type</label><select id="deckType" onchange="calcEstimate()"><option value="wood">Pressure-treated wood</option><option value="composite">Composite</option></select></div>
+          <div class="field"><label>Labor $/sq ft</label><input id="labor" type="number" value="18" oninput="calcEstimate()"></div>
+        </div>
+        <div id="estimateResults" style="margin-top:16px"></div>
+      </div>
+    </section>
+
+    <section id="pricing" class="panel">
+      <div class="chartWrap">
+        <h2>Board Pricing Fluctuation</h2>
+        <p style="color:#475467">Sample monthly trend for estimating demos. Replace these values with live supplier API data later.</p>
+        <div class="legend"><span><i class="dot wood"></i>Wood decking $/board</span><span><i class="dot comp"></i>Composite decking $/board</span></div>
+        <svg class="chart" id="priceChart" viewBox="0 0 900 360" preserveAspectRatio="none"></svg>
+      </div>
+    </section>
+
+    <section id="account" class="panel">
+      <div class="accountWrap">
+        <div class="lightCard">
+          <h2>Create Account</h2>
+          <p style="color:#475467">This local demo stores the account profile in your browser. A real SaaS version would connect this form to Supabase Auth, Clerk, or Auth.js.</p>
+          <div class="field"><label>Name</label><input id="acctName" placeholder="Your name"></div>
+          <div class="field"><label>Email</label><input id="acctEmail" placeholder="name@email.com"></div>
+          <div class="field"><label>Company</label><input id="acctCompany" placeholder="Company name"></div>
+          <div class="field"><label>Plan</label><select id="acctPlan"><option>Free</option><option>Pro - $29/mo</option><option>Business - $79/mo</option></select></div>
+          <button class="iconBtn primary" onclick="createAccount()">Create Local Account</button>
+        </div>
+        <div class="accountPreview">
+          <div class="accountAvatar" id="acctAvatar">SW</div>
+          <h2 id="acctDisplay">No account created yet</h2>
+          <p id="acctDetails">Create an account to preview the customer profile, company workspace, and subscription tier.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="saved" class="panel">
+      <div class="lightCard">
+        <h2>Saved Files Folder</h2>
+        <p style="color:#475467">Saved estimates and project snapshots are stored locally in this browser for the demo.</p>
+        <div id="savedList" class="savedList"></div>
+      </div>
+    </section>
+
+    <section id="help" class="panel">
+      <div class="lightCard"><h2>Help Center</h2><p style="color:#475467">Quick guide for using SpanWright v2.0.</p></div>
+      <div class="helpGrid" style="margin-top:14px">
+        <div class="helpItem"><h3>1. Start on the Dashboard</h3><p>Use the dashboard to view the deck model, takeoff summary, AI recommendations, live pricing, and project stats.</p></div>
+        <div class="helpItem"><h3>2. Design the Deck</h3><p>Open Designer to move deck, stair, and railing pieces around the grid. Future versions can connect these objects directly to material takeoffs.</p></div>
+        <div class="helpItem"><h3>3. Build an Estimate</h3><p>Enter customer details, dimensions, material type, and labor rate. The estimate updates automatically.</p></div>
+        <div class="helpItem"><h3>4. Review Board Pricing</h3><p>Use the pricing graph to compare wood versus composite board trends. Later this can be tied to supplier APIs.</p></div>
+        <div class="helpItem"><h3>5. Save Projects</h3><p>Tap Save Project to store the current project snapshot in the Saved Files folder.</p></div>
+        <div class="helpItem"><h3>6. Export PDF</h3><p>Tap Download PDF to open the print dialog. On iPhone, choose Share/Print and save the estimate as a PDF.</p></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const priceData=[
+  {m:'Jan',wood:17.80,comp:31.50},{m:'Feb',wood:18.40,comp:32.10},{m:'Mar',wood:19.20,comp:32.80},
+  {m:'Apr',wood:21.10,comp:33.20},{m:'May',wood:20.60,comp:34.40},{m:'Jun',wood:22.40,comp:35.60},
+  {m:'Jul',wood:23.10,comp:36.25},{m:'Aug',wood:21.90,comp:35.80},{m:'Sep',wood:20.30,comp:34.90},
+  {m:'Oct',wood:19.10,comp:34.20},{m:'Nov',wood:18.70,comp:33.75},{m:'Dec',wood:18.20,comp:33.10}
+];
+function showPanel(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.navBtn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(id==='pricing') drawPriceChart();
+}
+function calcEstimate(){
+  const L=+document.getElementById('deckLen').value||0,W=+document.getElementById('deckWid').value||0,labor=+document.getElementById('labor').value||0;
+  const type=document.getElementById('deckType').value, area=L*W, boardCost=type==='wood'?18.2:33.1, boards=Math.ceil(area/7.33*1.1);
+  const material=boards*boardCost, laborTotal=area*labor, total=(material+laborTotal)*1.18;
+  document.getElementById('estimateResults').innerHTML=`<div class="metrics" style="grid-template-columns:repeat(4,1fr)"><div class="metric" style="background:#F9FAFB;color:#101828"><span>Area</span><b>${area.toFixed(1)} sq ft</b></div><div class="metric" style="background:#F9FAFB;color:#101828"><span>Boards</span><b>${boards}</b></div><div class="metric" style="background:#F9FAFB;color:#101828"><span>Materials</span><b>$${material.toFixed(2)}</b></div><div class="metric" style="background:#F9FAFB;color:#101828"><span>Total</span><b>$${total.toFixed(2)}</b></div></div>`;
+  document.getElementById('dashDecking').textContent=Math.round(area*1.83)+' bd ft';
+  document.getElementById('dashTotal').textContent='$'+total.toFixed(2);
+}
+function drawPriceChart(){
+  const svg=document.getElementById('priceChart'); if(!svg)return;
+  const W=900,H=360,pad=48,max=40,min=15;
+  const x=i=>pad+i*((W-pad*2)/(priceData.length-1));
+  const y=v=>H-pad-((v-min)/(max-min))*(H-pad*2);
+  const line=(key)=>priceData.map((d,i)=>(i?'L':'M')+x(i)+','+y(d[key])).join(' ');
+  let grid=''; for(let v=15;v<=40;v+=5){grid+=`<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="#E5E7EB"/><text x="10" y="${y(v)+4}" fill="#667085" font-size="12">$${v}</text>`}
+  let months=priceData.map((d,i)=>`<text x="${x(i)-8}" y="${H-14}" fill="#667085" font-size="12">${d.m}</text>`).join('');
+  let pts=priceData.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.wood)}" r="4" fill="#A86A2F"/><circle cx="${x(i)}" cy="${y(d.comp)}" r="4" fill="#1F5F99"/>`).join('');
+  svg.innerHTML=`<rect width="${W}" height="${H}" fill="#fff"/><line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H-pad}" stroke="#D0D5DD"/><line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#D0D5DD"/>${grid}${months}<path d="${line('wood')}" fill="none" stroke="#A86A2F" stroke-width="4"/><path d="${line('comp')}" fill="none" stroke="#1F5F99" stroke-width="4"/>${pts}`;
+}
+function makeDraggable(el){
+  let sx=0,sy=0,l=0,t=0,drag=false;
+  el.addEventListener('pointerdown',e=>{drag=true; sx=e.clientX; sy=e.clientY; l=parseFloat(el.style.left||getComputedStyle(el).left); t=parseFloat(el.style.top||getComputedStyle(el).top); el.setPointerCapture(e.pointerId)});
+  el.addEventListener('pointermove',e=>{if(!drag)return; el.style.left=(l+e.clientX-sx)+'px'; el.style.top=(t+e.clientY-sy)+'px'});
+  el.addEventListener('pointerup',()=>drag=false);
+}
+function initDrag(){document.querySelectorAll('.draggable').forEach(makeDraggable)}
+function addBlock(type){
+  const c=document.getElementById('designCanvas'); let d=document.createElement('div');
+  if(type==='rail'){d.className='rail draggable'; d.style.left='100px'; d.style.top='100px'; d.style.width='180px'; d.style.height='8px'}
+  else {d.className=(type==='stair'?'stair':'deck')+' draggable'; d.style.left='80px'; d.style.top='80px'}
+  c.appendChild(d); makeDraggable(d);
+}
+function clearBlocks(){document.querySelectorAll('#designCanvas .draggable').forEach((el,i)=>{if(i>1)el.remove()})}
+function createAccount(){
+  const n=document.getElementById('acctName').value||'SpanWright User', e=document.getElementById('acctEmail').value||'No email added', c=document.getElementById('acctCompany').value||'Company not set', p=document.getElementById('acctPlan').value;
+  const data={n,e,c,p,date:new Date().toLocaleString()}; localStorage.setItem('spanwright_account',JSON.stringify(data)); renderAccount();
+}
+function renderAccount(){
+  const data=JSON.parse(localStorage.getItem('spanwright_account')||'null'); if(!data)return;
+  document.getElementById('acctDisplay').textContent=data.n;
+  document.getElementById('acctDetails').innerHTML=`<b>${data.c}</b><br>${data.e}<br>Plan: ${data.p}<br>Created: ${data.date}`;
+  document.getElementById('acctAvatar').textContent=data.n.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+}
+function saveProject(){
+  const arr=JSON.parse(localStorage.getItem('spanwright_saved')||'[]');
+  arr.unshift({project:document.getElementById('projectName').value, customer:document.getElementById('customer')?.value||'No customer', date:new Date().toLocaleString()});
+  localStorage.setItem('spanwright_saved',JSON.stringify(arr.slice(0,20))); renderSaved(); alert('Project saved to the Saved Files folder.');
+}
+function renderSaved(){
+  const arr=JSON.parse(localStorage.getItem('spanwright_saved')||'[]'), box=document.getElementById('savedList'); if(!box)return;
+  box.innerHTML=arr.length?arr.map((x,i)=>`<div class="savedItem"><b>${x.project}</b><p>${x.customer}</p><small>${x.date}</small><br><button class="iconBtn" onclick="deleteSaved(${i})">Delete</button></div>`).join(''):'<div class="savedItem">No saved files yet.</div>';
+}
+function deleteSaved(i){const arr=JSON.parse(localStorage.getItem('spanwright_saved')||'[]'); arr.splice(i,1); localStorage.setItem('spanwright_saved',JSON.stringify(arr)); renderSaved();}
+function downloadEstimate(){calcEstimate(); window.print();}
+calcEstimate(); drawPriceChart(); initDrag(); renderAccount(); renderSaved();
+</script>
+</body>
+</html>
